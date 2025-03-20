@@ -1,0 +1,265 @@
+/* Custom styles to complement Tailwind CSS */
+:root {
+    --primary-color: #2563eb;
+    --success-color: #16a34a;
+    --danger-color: #dc2626;
+    --text-color: #1f2937;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Card hover effects */
+.bg-white {
+    transition: all 0.3s ease;
+}
+
+.bg-white:hover {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Entry item animations */
+.entry-item {
+    transition: all 0.3s ease;
+}
+
+.entry-item:hover {
+    transform: translateX(5px);
+    background-color: #f8fafc;
+}
+
+/* Table row hover effect */
+tbody tr {
+    transition: all 0.2s ease;
+}
+
+tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Animation for adding/removing entries */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.entry-item {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Button hover effects */
+button {
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-1px);
+}
+
+/* Input focus effects */
+input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Radio button custom styling */
+input[type="radio"] {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e5e7eb;
+    border-radius: 50%;
+    margin-right: 8px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+input[type="radio"]:checked {
+    border-color: var(--primary-color);
+}
+
+input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Status badges */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.status-badge:hover {
+    transform: scale(1.05);
+}
+
+.status-income {
+    background-color: #dcfce7;
+    color: var(--success-color);
+}
+
+.status-expense {
+    background-color: #fee2e2;
+    color: var(--danger-color);
+}
+
+/* Header gradient animation */
+@keyframes gradientAnimation {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+header {
+    background-size: 200% 200%;
+    animation: gradientAnimation 15s ease infinite;
+}
+
+/* Dark mode transitions */
+.dark {
+    color-scheme: dark;
+}
+
+/* Notification animations */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.notification {
+    animation: slideInRight 0.3s ease-out;
+}
+
+.notification.hide {
+    animation: slideOutRight 0.3s ease-in forwards;
+}
+
+/* Icon animations */
+.icon-container {
+    transition: all 0.3s ease;
+}
+
+.icon-container:hover {
+    transform: rotate(15deg);
+}
+
+/* Table cell animations */
+td {
+    transition: all 0.2s ease;
+}
+
+td:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Form input animations */
+input {
+    transition: all 0.2s ease;
+}
+
+input:focus {
+    transform: translateY(-1px);
+}
+
+/* Responsive table */
+@media (max-width: 768px) {
+    .overflow-x-auto {
+        margin: 0 -1rem;
+        padding: 0 1rem;
+    }
+    
+    table {
+        min-width: 800px;
+    }
+}
+
+/* Loading animation */
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.loading {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Card flip animation */
+@keyframes flip {
+    0% {
+        transform: perspective(400px) rotateY(0);
+    }
+    100% {
+        transform: perspective(400px) rotateY(360deg);
+    }
+}
+
+.card-flip {
+    animation: flip 0.6s ease-in-out;
+} 
