@@ -1,6 +1,6 @@
-# Income Expense Calculator
+# Personal Budget Tracker
 
-A modern, responsive web application for tracking income and expenses with a clean and intuitive interface.
+A modern, responsive web application for managing personal finances with a clean and intuitive interface.
 
 ## Features
 

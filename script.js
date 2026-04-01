@@ -152,7 +152,7 @@ function renderEntries() {
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${
                 entry.type === 'income' ? 'text-green-600' : 'text-red-600'
             }">
-                ${entry.type === 'income' ? '+' : '-'}$${entry.amount.toFixed(2)}
+                ${entry.type === 'income' ? '+' : '-'}₹${entry.amount.toFixed(2)}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 <div class="flex items-center space-x-3">
@@ -215,7 +215,7 @@ function animateNumber(element, value) {
         const easeOutQuart = 1 - Math.pow(1 - progress, 4);
         
         const current = start + (end - start) * easeOutQuart;
-        element.textContent = `$${current.toFixed(2)}`;
+        element.textContent = `₹${current.toFixed(2)}`;
         
         if (progress < 1) {
             requestAnimationFrame(update);
