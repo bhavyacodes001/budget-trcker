@@ -1,5 +1,6 @@
 // Initialize state
 let entries = JSON.parse(localStorage.getItem('entries')) || [];
+let budgetLimits = JSON.parse(localStorage.getItem('budgetLimits')) || {};
 let currentFilter = 'all'; // For Type: all, income, expense
 let currentMonthFilter = ''; // For Date: 'YYYY-MM'
 
@@ -46,6 +47,19 @@ const categorySelect = document.getElementById('category');
 const typeRadios = document.querySelectorAll('input[name="type"]');
 const entryDateInput = document.getElementById('entry-date');
 
+// Budget Elements
+const budgetForm = document.getElementById('budget-form');
+const budgetCategorySelect = document.getElementById('budget-category');
+const budgetProgressContainer = document.getElementById('budget-progress-container');
+
+// Populate budget categories
+CATEGORIES.expense.forEach(cat => {
+    const opt = document.createElement('option');
+    opt.value = cat;
+    opt.textContent = cat;
+    budgetCategorySelect.appendChild(opt);
+});
+
 // Set today's date as default
 entryDateInput.value = new Date().toISOString().split('T')[0];
 
@@ -89,6 +103,21 @@ clearFilterBtn.addEventListener('click', () => {
     clearFilterBtn.classList.add('hidden');
     renderEntries();
     updateSummary();
+});
+
+// Budget Listener
+budgetForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const cat = budgetCategorySelect.value;
+    const limit = parseFloat(document.getElementById('budget-limit').value);
+    
+    if (cat && limit > 0) {
+        budgetLimits[cat] = limit;
+        localStorage.setItem('budgetLimits', JSON.stringify(budgetLimits));
+        budgetForm.reset();
+        showNotification(`Budget limit set for ${cat}`, 'success');
+        updateSummary(); // Re-render progress bars
+    }
 });
 
 // Populate category dropdown when type changes
@@ -152,6 +181,21 @@ function handleSubmit(e) {
 
     // Show success message with animation
     showNotification('Entry added successfully!', 'success');
+
+    // Budget Warning Check
+    if (type === 'expense' && budgetLimits[category]) {
+        // Calculate total for this exact month + category
+        const entryMonth = entryDate.substring(0, 7);
+        const currentTotal = entries
+            .filter(e => e.date && e.date.startsWith(entryMonth) && e.type === 'expense' && e.category === category)
+            .reduce((sum, e) => sum + e.amount, 0);
+
+        if (currentTotal > budgetLimits[category]) {
+            setTimeout(() => showNotification(`Warning: You have exceeded your budget for ${category}!`, 'error'), 1000);
+        } else if (currentTotal >= budgetLimits[category] * 0.8) {
+            setTimeout(() => showNotification(`Nearing limit: 80%+ of ${category} budget used.`, 'info'), 1000);
+        }
+    }
 
     // Add animation to the new entry
     const newRow = entriesList.lastElementChild;
@@ -217,7 +261,7 @@ function renderEntries() {
         }
         
         // Month filter check ('YYYY-MM')
-        if (currentMonthFilter && !entry.date.startsWith(currentMonthFilter)) {
+        if (currentMonthFilter && (!entry.date || !entry.date.startsWith(currentMonthFilter))) {
             return false;
         }
         
@@ -247,7 +291,8 @@ function renderEntries() {
         row.setAttribute('data-id', entry.id);
 
         // entry.date is now 'YYYY-MM-DD' string — parse correctly without timezone shift
-        const [year, month, day] = entry.date.split('-').map(Number);
+        const dateStr = entry.date || new Date().toISOString().split('T')[0];
+        const [year, month, day] = dateStr.split('-').map(Number);
         const date = new Date(year, month - 1, day);
         const formattedDate = date.toLocaleDateString('en-IN', {
             year: 'numeric',
@@ -306,7 +351,7 @@ function renderEntries() {
 function updateSummary() {
     // Determine which entries to include in the summary
     const summaryEntries = currentMonthFilter 
-        ? entries.filter(entry => entry.date.startsWith(currentMonthFilter)) 
+        ? entries.filter(entry => entry.date && entry.date.startsWith(currentMonthFilter)) 
         : entries;
 
     const totalIncome = summaryEntries
@@ -328,8 +373,61 @@ function updateSummary() {
     netBalanceElement.className = `text-3xl font-bold ${netBalance >= 0 ? 'text-green-600' : 'text-red-600'
         }`;
 
-    // Update charts with strictly the filtered monthly total
+    // Update charts and budget progress
     renderCharts(summaryEntries);
+    renderBudgetProgress(summaryEntries);
+}
+
+function renderBudgetProgress(summaryEntries) {
+    budgetProgressContainer.innerHTML = '';
+    const activeLimits = Object.keys(budgetLimits);
+    
+    if(activeLimits.length === 0) {
+        budgetProgressContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No budget limits set yet. Select a category above.</p>';
+        return;
+    }
+    
+    // Calculate total spent per category in currently viewed entries
+    const expenses = summaryEntries.filter(e => e.type === 'expense');
+    const spentPerCategory = {};
+    expenses.forEach(e => {
+        spentPerCategory[e.category] = (spentPerCategory[e.category] || 0) + e.amount;
+    });
+    
+    // Render progress bar for each set limit
+    activeLimits.forEach(cat => {
+        const limit = budgetLimits[cat];
+        const spent = spentPerCategory[cat] || 0;
+        const percentage = Math.min((spent / limit) * 100, 100).toFixed(1);
+        
+        let colorClass = 'bg-blue-500';
+        if (percentage >= 100) colorClass = 'bg-red-500';
+        else if (percentage >= 80) colorClass = 'bg-yellow-500';
+        
+        const div = document.createElement('div');
+        div.className = 'w-full';
+        div.innerHTML = `
+            <div class="flex justify-between mb-1">
+                <span class="text-sm font-medium text-gray-700">${cat}</span>
+                <span class="text-sm font-medium ${percentage >= 100 ? 'text-red-600' : 'text-gray-700'}">₹${spent.toFixed(2)} / ₹${limit.toFixed(2)}</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div class="${colorClass} h-2.5 rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
+            </div>
+        `;
+        // Double click to remove limit
+        div.addEventListener('dblclick', () => {
+             if(confirm(`Remove budget limit for ${cat}?`)) {
+                 delete budgetLimits[cat];
+                 localStorage.setItem('budgetLimits', JSON.stringify(budgetLimits));
+                 updateSummary();
+             }
+        });
+        div.title = "Double-click to remove limit";
+        div.style.cursor = "pointer";
+
+        budgetProgressContainer.appendChild(div);
+    });
 }
 
 function renderCharts(entriesToChart) {
@@ -404,8 +502,8 @@ function renderCharts(entriesToChart) {
 }
 
 function animateNumber(element, value) {
-    const start = parseFloat(element.textContent.replace(/[^0-9.-]+/g, ''));
-    const end = value;
+    const start = parseFloat(element.textContent.replace(/[^0-9.-]+/g, '')) || 0;
+    const end = value || 0;
     const duration = 500;
     const startTime = performance.now();
 
