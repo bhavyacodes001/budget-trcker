@@ -169,14 +169,11 @@
                 </div>
 
                 <!-- Date Filter -->
-                <div class="flex-1 min-w-[250px]">
+                <div class="flex-1 min-w-[200px]">
                     <label class="block text-sm text-gray-500 mb-2 font-medium uppercase tracking-wider" for="filter-month">By Month</label>
-                    <div class="flex gap-3">
-                        <input type="month" id="filter-month" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 font-medium h-[42px] m-0">
-                        <button id="clear-filter-btn" class="px-4 py-2 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 hover:text-red-700 hover:border-red-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-all font-medium whitespace-nowrap hidden h-[42px]">
-                            Clear
-                        </button>
-                    </div>
+                    <select id="filter-month" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 font-medium h-[42px] m-0 bg-white cursor-pointer">
+                        <option value="">All Time</option>
+                    </select>
                 </div>
             </div>
         </section>

@@ -42,7 +42,6 @@ const totalExpensesElement = document.getElementById('total-expenses');
 const netBalanceElement = document.getElementById('net-balance');
 const filterInputs = document.querySelectorAll('input[name="filter"]');
 const filterMonthInput = document.getElementById('filter-month');
-const clearFilterBtn = document.getElementById('clear-filter-btn');
 const categorySelect = document.getElementById('category');
 const typeRadios = document.querySelectorAll('input[name="type"]');
 const entryDateInput = document.getElementById('entry-date');
@@ -63,20 +62,6 @@ CATEGORIES.expense.forEach(cat => {
 // Set today's date as default
 entryDateInput.value = new Date().toISOString().split('T')[0];
 
-// Make clicking anywhere on the date input open the calendar picker automatically
-function openDatePicker(e) {
-    try {
-        this.showPicker();
-    } catch (err) {
-        // Fallback silently if unsupported
-    }
-}
-
-entryDateInput.addEventListener('click', openDatePicker);
-entryDateInput.addEventListener('focus', openDatePicker);
-filterMonthInput.addEventListener('click', openDatePicker);
-filterMonthInput.addEventListener('focus', openDatePicker);
-
 // Event Listeners
 form.addEventListener('submit', handleSubmit);
 filterInputs.forEach(input => {
@@ -88,19 +73,6 @@ filterInputs.forEach(input => {
 
 filterMonthInput.addEventListener('change', (e) => {
     currentMonthFilter = e.target.value;
-    if (currentMonthFilter) {
-        clearFilterBtn.classList.remove('hidden');
-    } else {
-        clearFilterBtn.classList.add('hidden');
-    }
-    renderEntries();
-    updateSummary();
-});
-
-clearFilterBtn.addEventListener('click', () => {
-    filterMonthInput.value = '';
-    currentMonthFilter = '';
-    clearFilterBtn.classList.add('hidden');
     renderEntries();
     updateSummary();
 });
@@ -142,7 +114,35 @@ function populateCategoryDropdown(type) {
     });
 }
 
+function updateMonthFilterOptions() {
+    // Unique months in format YYYY-MM
+    const uniqueMonths = [...new Set(entries.map(e => e.date ? e.date.substring(0, 7) : ''))].filter(Boolean).sort().reverse();
+    
+    const currentVal = filterMonthInput.value;
+    filterMonthInput.innerHTML = '<option value="">All Time</option>';
+    
+    uniqueMonths.forEach(ym => {
+        const [year, month] = ym.split('-');
+        const date = new Date(year, month - 1, 1);
+        const name = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+        
+        const opt = document.createElement('option');
+        opt.value = ym;
+        opt.textContent = name;
+        filterMonthInput.appendChild(opt);
+    });
+    
+    // Retain previous selection if valid
+    if (uniqueMonths.includes(currentVal)) {
+        filterMonthInput.value = currentVal;
+    } else {
+        filterMonthInput.value = '';
+        currentMonthFilter = '';
+    }
+}
+
 // Initialize the app
+updateMonthFilterOptions();
 renderEntries();
 updateSummary();
 
@@ -173,6 +173,7 @@ function handleSubmit(e) {
 
     entries.push(entry);
     saveToLocalStorage();
+    updateMonthFilterOptions();
     renderEntries();
     updateSummary();
     form.reset();
@@ -212,6 +213,7 @@ function deleteEntry(id) {
             setTimeout(() => {
                 entries = entries.filter(entry => entry.id !== id);
                 saveToLocalStorage();
+                updateMonthFilterOptions();
                 renderEntries();
                 updateSummary();
                 showNotification('Entry deleted successfully!', 'success');
