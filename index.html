@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Budget Tracker</title>
+    <!-- Tailwind CSS (CDN for simple local usage without build process) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js for Data Visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom Styles -->
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
+
 <body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen font-['Poppins']">
     <!-- Header Section -->
     <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-8 shadow-lg relative overflow-hidden">
@@ -18,12 +25,16 @@
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                            </path>
                         </svg>
                     </div>
                     <div>
-                        <h1 class="text-3xl md:text-4xl font-bold animate__animated animate__fadeInDown">Personal Budget Tracker</h1>
-                        <p class="text-blue-100 text-sm md:text-base animate__animated animate__fadeInUp">Take control of your personal finances</p>
+                        <h1 class="text-3xl md:text-4xl font-bold animate__animated animate__fadeInDown">Personal Budget
+                            Tracker</h1>
+                        <p class="text-blue-100 text-sm md:text-base animate__animated animate__fadeInUp">Take control
+                            of your personal finances</p>
                     </div>
                 </div>
             </div>
@@ -34,34 +45,43 @@
         <!-- Summary Section -->
         <section class="mb-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 animate__animated animate__fadeInLeft">
+                <div
+                    class="bg-white p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 animate__animated animate__fadeInLeft">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-lg font-semibold text-gray-700">Total Income</h2>
                         <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                             <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
                             </svg>
                         </div>
                     </div>
                     <p id="total-income" class="text-3xl font-bold text-green-600">₹0.00</p>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 animate__animated animate__fadeInUp">
+                <div
+                    class="bg-white p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 animate__animated animate__fadeInUp">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-lg font-semibold text-gray-700">Total Expenses</h2>
                         <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
                             <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
                             </svg>
                         </div>
                     </div>
                     <p id="total-expenses" class="text-3xl font-bold text-red-600">₹0.00</p>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 animate__animated animate__fadeInRight">
+                <div
+                    class="bg-white p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 animate__animated animate__fadeInRight">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-lg font-semibold text-gray-700">Net Balance</h2>
                         <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                             <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                </path>
                             </svg>
                         </div>
                     </div>
@@ -71,10 +91,12 @@
         </section>
 
         <!-- Input Form Section -->
-        <section class="bg-white p-8 rounded-xl shadow-lg mb-8 transform hover:scale-[1.01] transition-all duration-300">
+        <section
+            class="bg-white p-8 rounded-xl shadow-lg mb-8 transform hover:scale-[1.01] transition-all duration-300">
             <h2 class="text-2xl font-semibold mb-6 text-gray-800">Add New Entry</h2>
             <form id="expense-form" class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Row 1 -->
                     <div>
                         <label class="block text-gray-700 mb-2 font-medium">Description</label>
                         <input type="text" id="description" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required placeholder="Enter description">
@@ -83,39 +105,94 @@
                         <label class="block text-gray-700 mb-2 font-medium">Amount</label>
                         <input type="number" id="amount" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required placeholder="Enter amount">
                     </div>
-                </div>
-                <div class="flex gap-6">
-                    <div class="flex items-center">
-                        <input type="radio" id="income" name="type" value="income" class="w-5 h-5 text-green-600 focus:ring-green-500">
-                        <label for="income" class="ml-2 text-gray-700 font-medium">Income</label>
+                    <div>
+                        <label class="block text-gray-700 mb-2 font-medium">Date</label>
+                        <input type="date" id="entry-date" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                     </div>
-                    <div class="flex items-center">
-                        <input type="radio" id="expense" name="type" value="expense" class="w-5 h-5 text-red-600 focus:ring-red-500">
-                        <label for="expense" class="ml-2 text-gray-700 font-medium">Expense</label>
+                    
+                    <!-- Row 2 -->
+                    <div>
+                        <label class="block text-gray-700 mb-2 font-medium">Type</label>
+                        <div class="flex gap-6 mt-1 h-[50px] items-center">
+                            <div class="flex items-center">
+                                <input type="radio" id="income" name="type" value="income" class="w-5 h-5 text-green-600 focus:ring-green-500">
+                                <label for="income" class="ml-2 text-gray-700 font-medium">Income</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="expense" name="type" value="expense" class="w-5 h-5 text-red-600 focus:ring-red-500">
+                                <label for="expense" class="ml-2 text-gray-700 font-medium">Expense</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2 font-medium">Category</label>
+                        <select id="category" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white" required>
+                            <option value="">-- Select Type First --</option>
+                        </select>
                     </div>
                 </div>
                 <div class="flex gap-4">
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300 font-medium transform hover:scale-105">Add Entry</button>
-                    <button type="reset" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all duration-300 font-medium transform hover:scale-105">Reset</button>
+                    <button type="submit"
+                        class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300 font-medium transform hover:scale-105">Add
+                        Entry</button>
+                    <button type="reset"
+                        class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all duration-300 font-medium transform hover:scale-105">Reset</button>
                 </div>
             </form>
         </section>
 
         <!-- Filters Section -->
-        <section class="bg-white p-6 rounded-xl shadow-lg mb-8 transform hover:scale-[1.01] transition-all duration-300">
+        <section
+            class="bg-white p-6 rounded-xl shadow-lg mb-8 transform hover:scale-[1.01] transition-all duration-300">
             <h2 class="text-2xl font-semibold mb-4 text-gray-800">Filter Entries</h2>
-            <div class="flex gap-6">
-                <div class="flex items-center">
-                    <input type="radio" id="filter-all" name="filter" value="all" checked class="w-5 h-5 text-blue-600 focus:ring-blue-500">
-                    <label for="filter-all" class="ml-2 text-gray-700 font-medium">All</label>
+            <div class="flex flex-wrap items-end gap-8">
+                <!-- Type Filter -->
+                <div>
+                    <label class="block text-sm text-gray-500 mb-3 font-medium uppercase tracking-wider">By Type</label>
+                    <div class="flex gap-6 h-[42px] items-center">
+                        <div class="flex items-center">
+                            <input type="radio" id="filter-all" name="filter" value="all" checked
+                                class="w-5 h-5 text-blue-600 focus:ring-blue-500">
+                            <label for="filter-all" class="ml-2 text-gray-700 font-medium">All</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio" id="filter-income" name="filter" value="income"
+                                class="w-5 h-5 text-green-600 focus:ring-green-500">
+                            <label for="filter-income" class="ml-2 text-gray-700 font-medium">Income</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio" id="filter-expense" name="filter" value="expense"
+                                class="w-5 h-5 text-red-600 focus:ring-red-500">
+                            <label for="filter-expense" class="ml-2 text-gray-700 font-medium">Expense</label>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex items-center">
-                    <input type="radio" id="filter-income" name="filter" value="income" class="w-5 h-5 text-green-600 focus:ring-green-500">
-                    <label for="filter-income" class="ml-2 text-gray-700 font-medium">Income</label>
+
+                <!-- Date Filter -->
+                <div class="flex-1 min-w-[250px]">
+                    <label class="block text-sm text-gray-500 mb-2 font-medium uppercase tracking-wider" for="filter-month">By Month</label>
+                    <div class="flex gap-3">
+                        <input type="month" id="filter-month" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 font-medium h-[42px] m-0">
+                        <button id="clear-filter-btn" class="px-4 py-2 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 hover:text-red-700 hover:border-red-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-all font-medium whitespace-nowrap hidden h-[42px]">
+                            Clear
+                        </button>
+                    </div>
                 </div>
-                <div class="flex items-center">
-                    <input type="radio" id="filter-expense" name="filter" value="expense" class="w-5 h-5 text-red-600 focus:ring-red-500">
-                    <label for="filter-expense" class="ml-2 text-gray-700 font-medium">Expense</label>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white p-6 rounded-xl shadow-lg transform hover:scale-[1.01] transition-all duration-300">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800 text-center">Income vs Expenses</h2>
+                <div class="relative h-64 w-full flex justify-center items-center">
+                    <canvas id="balanceChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg transform hover:scale-[1.01] transition-all duration-300">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800 text-center">Expenses by Category</h2>
+                <div class="relative h-64 w-full flex justify-center items-center">
+                    <canvas id="categoryChart"></canvas>
                 </div>
             </div>
         </section>
@@ -127,11 +204,18 @@
                 <table class="min-w-full">
                     <thead>
                         <tr class="bg-gray-50">
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Description</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Category</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Amount</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions</th>
                         </tr>
                     </thead>
                     <tbody id="entries-list" class="bg-white divide-y divide-gray-200">
@@ -143,4 +227,5 @@
     </main>
     <script src="script.js"></script>
 </body>
+
 </html>
