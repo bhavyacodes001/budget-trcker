@@ -1,8 +1,10 @@
 // Initialize state
-let entries = JSON.parse(localStorage.getItem('entries')) || [];
-let budgetLimits = JSON.parse(localStorage.getItem('budgetLimits')) || {};
+let entries = [];
+let budgetLimits = {};
 let currentFilter = 'all'; // For Type: all, income, expense
 let currentMonthFilter = ''; // For Date: 'YYYY-MM'
+let currentUser = localStorage.getItem('currentUser') || '';
+let isLoginMode = false;
 
 // Chart instances
 let balanceChartInstance = null;
@@ -45,11 +47,242 @@ const filterMonthInput = document.getElementById('filter-month');
 const categorySelect = document.getElementById('category');
 const typeRadios = document.querySelectorAll('input[name="type"]');
 const entryDateInput = document.getElementById('entry-date');
+const authSection = document.getElementById('auth-section');
+const appContent = document.getElementById('app-content');
+const userPanel = document.getElementById('user-panel');
+const profileName = document.getElementById('profile-name');
+const openProfileBtn = document.getElementById('open-profile-btn');
+const logoutBtn = document.getElementById('logout-btn');
+const dashboardView = document.getElementById('dashboard-view');
+const profileView = document.getElementById('profile-view');
+const backToDashboardBtn = document.getElementById('back-to-dashboard-btn');
+
+// Auth elements
+const authForm = document.getElementById('auth-form');
+const authTitle = document.getElementById('auth-title');
+const authSubtitle = document.getElementById('auth-subtitle');
+const authSubmitBtn = document.getElementById('auth-submit-btn');
+const authSwitchBtn = document.getElementById('auth-switch-btn');
+const authSwitchLabel = document.getElementById('auth-switch-label');
+const authNameWrapper = document.getElementById('auth-name-wrapper');
+const authNameInput = document.getElementById('auth-name');
+const authEmailInput = document.getElementById('auth-email');
+const authPasswordInput = document.getElementById('auth-password');
 
 // Budget Elements
 const budgetForm = document.getElementById('budget-form');
 const budgetCategorySelect = document.getElementById('budget-category');
 const budgetProgressContainer = document.getElementById('budget-progress-container');
+const profileForm = document.getElementById('profile-form');
+const profileUpdateNameInput = document.getElementById('profile-update-name');
+const profileUpdateEmailInput = document.getElementById('profile-update-email');
+const profileUpdatePasswordInput = document.getElementById('profile-update-password');
+
+// Helpers for per-user local storage
+function sanitizeEmail(email) {
+    return email.trim().toLowerCase();
+}
+
+function getEntriesKey(email) {
+    return `entries:${sanitizeEmail(email)}`;
+}
+
+function getBudgetKey(email) {
+    return `budgetLimits:${sanitizeEmail(email)}`;
+}
+
+function getUsers() {
+    return JSON.parse(localStorage.getItem('users') || '[]');
+}
+
+function saveUsers(users) {
+    localStorage.setItem('users', JSON.stringify(users));
+}
+
+function getCurrentUserRecord() {
+    const users = getUsers();
+    return users.find((user) => user.email === currentUser) || null;
+}
+
+function getDisplayName() {
+    const user = getCurrentUserRecord();
+    if (!user) return '';
+    if (user.name && user.name.trim()) return user.name.trim();
+    const emailPrefix = user.email ? user.email.split('@')[0] : '';
+    return emailPrefix || user.email;
+}
+
+function populateProfileSection() {
+    if (!currentUser) return;
+    const user = getCurrentUserRecord();
+    profileUpdateNameInput.value = getDisplayName();
+    profileUpdateEmailInput.value = currentUser;
+    profileUpdatePasswordInput.value = '';
+}
+
+function saveBudgetToLocalStorage() {
+    if (!currentUser) return;
+    localStorage.setItem(getBudgetKey(currentUser), JSON.stringify(budgetLimits));
+}
+
+function saveToLocalStorage() {
+    if (!currentUser) return;
+    localStorage.setItem(getEntriesKey(currentUser), JSON.stringify(entries));
+}
+
+function loadUserData() {
+    if (!currentUser) {
+        entries = [];
+        budgetLimits = {};
+        return;
+    }
+    entries = JSON.parse(localStorage.getItem(getEntriesKey(currentUser)) || '[]');
+    budgetLimits = JSON.parse(localStorage.getItem(getBudgetKey(currentUser)) || '{}');
+}
+
+function updateAuthView() {
+    const loggedIn = Boolean(currentUser);
+    authSection.classList.toggle('hidden', loggedIn);
+    appContent.classList.toggle('hidden', !loggedIn);
+    userPanel.classList.toggle('hidden', !loggedIn);
+
+    if (loggedIn) {
+        dashboardView.classList.remove('hidden');
+        profileView.classList.add('hidden');
+        profileName.textContent = getDisplayName();
+        populateProfileSection();
+        updateMonthFilterOptions();
+        renderEntries();
+        updateSummary();
+    }
+}
+
+function setAuthMode(loginMode) {
+    isLoginMode = loginMode;
+    if (isLoginMode) {
+        authNameWrapper.classList.add('hidden');
+        authNameInput.required = false;
+        authTitle.textContent = 'Log In';
+        authSubtitle.textContent = 'Access your saved budget data.';
+        authSubmitBtn.textContent = 'Log In';
+        authSwitchLabel.textContent = "Don't have an account?";
+        authSwitchBtn.textContent = 'Sign up';
+    } else {
+        authNameWrapper.classList.remove('hidden');
+        authNameInput.required = true;
+        authTitle.textContent = 'Sign Up';
+        authSubtitle.textContent = 'Create your account to start tracking.';
+        authSubmitBtn.textContent = 'Create Account';
+        authSwitchLabel.textContent = 'Already have an account?';
+        authSwitchBtn.textContent = 'Log in';
+    }
+}
+
+function handleAuthSubmit(e) {
+    e.preventDefault();
+    const name = authNameInput.value.trim();
+    const email = sanitizeEmail(authEmailInput.value);
+    const password = authPasswordInput.value;
+
+    if (!email || !password) {
+        showNotification('Please fill email and password.', 'error');
+        return;
+    }
+
+    if (password.length < 6) {
+        showNotification('Password must be at least 6 characters.', 'error');
+        return;
+    }
+
+    const users = getUsers();
+    const existingUser = users.find((user) => user.email === email);
+
+    if (isLoginMode) {
+        if (!existingUser || existingUser.password !== password) {
+            showNotification('Invalid email or password.', 'error');
+            return;
+        }
+    } else {
+        if (!name) {
+            showNotification('Please enter your name.', 'error');
+            return;
+        }
+        if (existingUser) {
+            showNotification('Email already exists. Please log in.', 'error');
+            return;
+        }
+        users.push({ name, email, password });
+        saveUsers(users);
+    }
+
+    currentUser = email;
+    localStorage.setItem('currentUser', currentUser);
+    loadUserData();
+    authForm.reset();
+    updateAuthView();
+    showNotification(isLoginMode ? 'Logged in successfully!' : 'Account created successfully!', 'success');
+}
+
+function logout() {
+    currentUser = '';
+    localStorage.removeItem('currentUser');
+    entries = [];
+    budgetLimits = {};
+    filterMonthInput.value = '';
+    currentMonthFilter = '';
+    setAuthMode(true);
+    updateAuthView();
+    showNotification('Logged out successfully.', 'info');
+}
+
+function openProfileView() {
+    if (!currentUser) return;
+    populateProfileSection();
+    dashboardView.classList.add('hidden');
+    profileView.classList.remove('hidden');
+}
+
+function openDashboardView() {
+    dashboardView.classList.remove('hidden');
+    profileView.classList.add('hidden');
+}
+
+function handleProfileUpdate(e) {
+    e.preventDefault();
+    if (!currentUser) return;
+
+    const name = profileUpdateNameInput.value.trim();
+    const newPassword = profileUpdatePasswordInput.value;
+
+    if (!name) {
+        showNotification('Name cannot be empty.', 'error');
+        return;
+    }
+
+    if (newPassword && newPassword.length < 6) {
+        showNotification('New password must be at least 6 characters.', 'error');
+        return;
+    }
+
+    const users = getUsers();
+    const userIndex = users.findIndex((user) => user.email === currentUser);
+
+    if (userIndex === -1) {
+        showNotification('User not found. Please log in again.', 'error');
+        logout();
+        return;
+    }
+
+    users[userIndex].name = name;
+    if (newPassword) {
+        users[userIndex].password = newPassword;
+    }
+    saveUsers(users);
+
+    profileName.textContent = getDisplayName();
+    profileUpdatePasswordInput.value = '';
+    showNotification('Profile updated successfully!', 'success');
+}
 
 // Populate budget categories
 CATEGORIES.expense.forEach(cat => {
@@ -64,6 +297,12 @@ entryDateInput.value = new Date().toISOString().split('T')[0];
 
 // Event Listeners
 form.addEventListener('submit', handleSubmit);
+authForm.addEventListener('submit', handleAuthSubmit);
+authSwitchBtn.addEventListener('click', () => setAuthMode(!isLoginMode));
+logoutBtn.addEventListener('click', logout);
+openProfileBtn.addEventListener('click', openProfileView);
+backToDashboardBtn.addEventListener('click', openDashboardView);
+profileForm.addEventListener('submit', handleProfileUpdate);
 filterInputs.forEach(input => {
     input.addEventListener('change', (e) => {
         currentFilter = e.target.value;
@@ -85,7 +324,7 @@ budgetForm.addEventListener('submit', (e) => {
     
     if (cat && limit > 0) {
         budgetLimits[cat] = limit;
-        localStorage.setItem('budgetLimits', JSON.stringify(budgetLimits));
+        saveBudgetToLocalStorage();
         budgetForm.reset();
         showNotification(`Budget limit set for ${cat}`, 'success');
         updateSummary(); // Re-render progress bars
@@ -142,9 +381,9 @@ function updateMonthFilterOptions() {
 }
 
 // Initialize the app
-updateMonthFilterOptions();
-renderEntries();
-updateSummary();
+setAuthMode(!currentUser);
+loadUserData();
+updateAuthView();
 
 // Functions
 function handleSubmit(e) {
@@ -421,7 +660,7 @@ function renderBudgetProgress(summaryEntries) {
         div.addEventListener('dblclick', () => {
              if(confirm(`Remove budget limit for ${cat}?`)) {
                  delete budgetLimits[cat];
-                 localStorage.setItem('budgetLimits', JSON.stringify(budgetLimits));
+                 saveBudgetToLocalStorage();
                  updateSummary();
              }
         });
@@ -525,10 +764,6 @@ function animateNumber(element, value) {
     }
 
     requestAnimationFrame(update);
-}
-
-function saveToLocalStorage() {
-    localStorage.setItem('entries', JSON.stringify(entries));
 }
 
 function showNotification(message, type = 'info') {
